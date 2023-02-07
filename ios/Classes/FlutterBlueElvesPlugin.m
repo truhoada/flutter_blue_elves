@@ -26,7 +26,6 @@
 
 -(instancetype)init{
     self = [super init];
-    self.centralManager=[[CBCentralManager alloc]initWithDelegate:self queue:nil];
     self.devicesMap=[NSMutableDictionary new];
     self.scanDeviceCaches=[NSMutableDictionary new];
     self.hideConnectedDeviceCaches=[NSMutableDictionary new];
@@ -34,7 +33,15 @@
     return self;
 }
 
+- (void)registerBluetoothPermissionIfNeeded {
+    if (self.centralManager == nil) {
+        self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+    }
+}
+
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
+    [self registerBluetoothPermissionIfNeeded]; // Ask bluetooth permission if needed
+
     if ([@"checkBluetoothState" isEqualToString:call.method]) {//如果是获取蓝牙状态
         if(self.centralManager.state==CBManagerStateUnknown)
             result([NSNumber numberWithInt:0]);
